@@ -17,6 +17,15 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         initComponents();
         controlador = new ControladorTecnicas();
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup1.add(radioRelief);
+        buttonGroup1.add(jRadioButton2);
+        buttonGroup1.add(jRadioButton3);
+        buttonGroup1.add(jRadioButton4);
+        // Establecer action commands
+        radioRelief.setActionCommand("RELIEF");
+        jRadioButton2.setActionCommand("TECNICA2");
+        jRadioButton3.setActionCommand("TECNICA3");
+        jRadioButton4.setActionCommand("TECNICA4");
     }
     
     private void buscarDataset() {
@@ -48,27 +57,27 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     }
 
     private void ejecutarTecnica() {
-
+        
         if (dataset == null) {
-            JOptionPane.showMessageDialog(this,"Primero debes cargar un dataset.");
+            JOptionPane.showMessageDialog(this,"Primero debes cargar un dataset.","Error",JOptionPane.ERROR_MESSAGE );
             return;
         }
 
         ButtonModel seleccion = buttonGroup1.getSelection();
 
         if (seleccion == null) {
-            JOptionPane.showMessageDialog(this,"Selecciona una técnica.");
+            JOptionPane.showMessageDialog(this,"Selecciona una técnica.","Información",JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         String tecnicaSeleccionada = seleccion.getActionCommand();
-
+        System.out.println("Técnica seleccionada: " + tecnicaSeleccionada); // Para depuración
         Resultado resultado = controlador.ejecutarTecnica(tecnicaSeleccionada, dataset);
 
         if (resultado != null) {
             txtAreaResultados.setText(resultado.generarReporte());
         } else {
-            txtAreaResultados.setText("La técnica aún no está implementada.");
+            txtAreaResultados.setText("La técnica '" + tecnicaSeleccionada + "' aún no está implementada.");
         }
     }
     
@@ -292,8 +301,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnIniciarActionPerformed
 
     private void radioReliefActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioReliefActionPerformed
-        // TODO add your handling code here:
-        radioRelief.setActionCommand("RELIEF");
+
     }//GEN-LAST:event_radioReliefActionPerformed
 
     public static void main(String args[]) {
