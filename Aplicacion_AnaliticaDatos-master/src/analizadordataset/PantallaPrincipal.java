@@ -57,27 +57,43 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     }
 
     private void ejecutarTecnica() {
-        
         if (dataset == null) {
             JOptionPane.showMessageDialog(this,"Primero debes cargar un dataset.","Error",JOptionPane.ERROR_MESSAGE );
             return;
         }
 
-        ButtonModel seleccion = buttonGroup1.getSelection();
+        String tecnicaSeleccionada = "";
 
-        if (seleccion == null) {
+        if (radioRelief.isSelected()) {
+            tecnicaSeleccionada = "RELIEF";
+        } else if (jRadioButton2.isSelected()) {
+            tecnicaSeleccionada = "TECNICA2"; 
+        } else if (jRadioButton3.isSelected()) {
+            tecnicaSeleccionada = "TECNICA3";
+        } else if (jRadioButton4.isSelected()) {
+            tecnicaSeleccionada = "INFOGAIN"; 
+        } else {
             JOptionPane.showMessageDialog(this,"Selecciona una técnica.","Información",JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        String tecnicaSeleccionada = seleccion.getActionCommand();
-        System.out.println("Técnica seleccionada: " + tecnicaSeleccionada); // Para depuración
+        if (tecnicaSeleccionada.equals("INFOGAIN")) {
+            int claseIndex = dataset.getNumAtributos() - 1;
+            if (dataset.getTipoColumna(claseIndex) != 'C') {
+                JOptionPane.showMessageDialog(this,
+                    "Information Gain requiere que la clase (última columna) sea categórica.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
         Resultado resultado = controlador.ejecutarTecnica(tecnicaSeleccionada, dataset);
 
         if (resultado != null) {
             txtAreaResultados.setText(resultado.generarReporte());
         } else {
-            txtAreaResultados.setText("La técnica '" + tecnicaSeleccionada + "' aún no está implementada.");
+            txtAreaResultados.setText("Error al ejecutar la técnica.");
         }
     }
     
@@ -124,7 +140,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
         infoLbl.setText("Info...");
 
-        PanelPestañas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        PanelPestañas.setBorder(javax.swing.BorderFactory.createLineBorder(null));
 
         radioRelief.setText("Relief");
         radioRelief.addActionListener(new java.awt.event.ActionListener() {
@@ -147,7 +163,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             }
         });
 
-        jRadioButton4.setText("Tecnica 4");
+        jRadioButton4.setText("Information Gain");
 
         btnIniciar.setText("Iniciar");
         btnIniciar.addActionListener(new java.awt.event.ActionListener() {

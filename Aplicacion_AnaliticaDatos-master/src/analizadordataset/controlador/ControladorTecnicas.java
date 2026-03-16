@@ -20,7 +20,10 @@ public class ControladorTecnicas {
             // break;
             case "TECNICA2":
                 tecnica = new GreedyStepwise();
+                break;
                 
+            case "INFOGAIN":
+                tecnica = new InformationGain();
                 break;
         }
 
