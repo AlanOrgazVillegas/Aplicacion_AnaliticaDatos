@@ -21,6 +21,10 @@ public class ControladorTecnicas {
             case "GREEDY":
                 tecnica = new GreedyStepwise();
                 break;
+                
+            case "INFOGAIN":
+                tecnica = new InformationGain();
+                break;
 
             // luego agregas:
             // case "GOWER":

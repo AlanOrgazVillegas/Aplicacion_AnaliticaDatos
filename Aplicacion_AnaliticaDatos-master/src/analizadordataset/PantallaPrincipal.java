@@ -68,7 +68,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     } else if (jRadioButton3.isSelected()) {
         tecnicaSeleccionada = "GREEDY";
     } else if (jRadioButton4.isSelected()) {
-        tecnicaSeleccionada = "TECNICA4";
+        tecnicaSeleccionada = "INFOGAIN";
     } else {
         JOptionPane.showMessageDialog(this,"Selecciona una técnica.","Información",JOptionPane.WARNING_MESSAGE);
         return;
@@ -87,6 +87,18 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             return;
         }
     }
+    
+    if (tecnicaSeleccionada.equals("INFOGAIN")) {
+            int claseIndex = dataset.getNumAtributos() - 1;
+            if (dataset.getTipoColumna(claseIndex) != 'C') {
+                JOptionPane.showMessageDialog(this,
+                    "Information Gain requiere que la clase (última columna) sea categórica.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
     
     Resultado resultado = controlador.ejecutarTecnica(tecnicaSeleccionada, dataset);
 
@@ -234,7 +246,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             }
         });
 
-        jRadioButton4.setText("Tecnica 4");
+        jRadioButton4.setText("Information Gain");
 
         btnIniciar.setText("Iniciar");
         btnIniciar.addActionListener(new java.awt.event.ActionListener() {
