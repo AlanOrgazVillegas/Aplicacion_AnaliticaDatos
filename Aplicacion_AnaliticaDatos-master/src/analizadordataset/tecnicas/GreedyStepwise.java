@@ -6,13 +6,6 @@ import analizadordataset.modelo.Resultado;
 
 import java.util.*;
 
-
-
-/**
- *
- * @author Mauchis
- */
-
 /**
  * GreedyStepwise – Selección de características por búsqueda greedy forward/backward.
  *

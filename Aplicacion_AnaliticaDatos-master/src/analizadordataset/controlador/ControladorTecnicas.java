@@ -13,18 +13,20 @@ public class ControladorTecnicas {
             case "RELIEF":
                 tecnica = new ReliefF();
                 break;
+                
+            case "CORRELATION":
+                tecnica = new CorrelationScore();
+                break;
+                
+            case "GREEDY":
+                tecnica = new GreedyStepwise();
+                break;
 
             // luego agregas:
             // case "GOWER":
             // tecnica = new Gower();
             // break;
-            case "TECNICA2":
-                tecnica = new GreedyStepwise();
-                break;
-                
-            case "INFOGAIN":
-                tecnica = new InformationGain();
-                break;
+            
         }
 
         if (tecnica == null) {

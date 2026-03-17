@@ -3,13 +3,18 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos-master/Aplicacion_AnaliticaDatos-master/src/analizadordataset/modelo/Dataset.java</file>
-            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos-master/Aplicacion_AnaliticaDatos-master/src/analizadordataset/controlador/ControladorTecnicas.java</file>
-            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos-master/Aplicacion_AnaliticaDatos-master/src/analizadordataset/tecnicas/Tecnica.java</file>
-            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos-master/Aplicacion_AnaliticaDatos-master/src/analizadordataset/PantallaPrincipal.java</file>
-            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos-master/Aplicacion_AnaliticaDatos-master/src/analizadordataset/tecnicas/ReliefF.java</file>
-            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos-master/Aplicacion_AnaliticaDatos-master/src/analizadordataset/modelo/Resultado.java</file>
-            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos-master/Aplicacion_AnaliticaDatos-master/src/analizadordataset/tecnicas/GreedyStepwise.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/clasificacion/NaiveBayes.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/PantallaPrincipal.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/controlador/ControladorClasificacion.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/clasificacion/Clasificador.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/tecnicas/ReliefF.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/tecnicas/Tecnica.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/modelo/Resultado.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/controlador/ControladorTecnicas.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/modelo/ResultadoClasificacion.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/tecnicas/CorrelationScore.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/clasificacion/J48.java</file>
+            <file>file:/C:/Users/Mauchis/OneDrive/Escritorio/Aplicacion_AnaliticaDatos/src/analizadordataset/tecnicas/GreedyStepwise.java</file>
         </group>
     </open-files>
 </project-private>

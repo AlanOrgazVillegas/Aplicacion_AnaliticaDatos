@@ -3,7 +3,8 @@ package analizadordataset;
 import analizadordataset.modelo.Dataset;
 import analizadordataset.modelo.Resultado;
 import analizadordataset.controlador.ControladorTecnicas;
-
+import analizadordataset.modelo.ResultadoClasificacion;
+import analizadordataset.controlador.ControladorClasificacion;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
@@ -12,21 +13,15 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
     private Dataset dataset;
     private ControladorTecnicas controlador;
+    private ControladorClasificacion controladorClasif;
     
     public PantallaPrincipal() {
-        initComponents();
-        controlador = new ControladorTecnicas();
-        buttonGroup1 = new javax.swing.ButtonGroup();
-        buttonGroup1.add(radioRelief);
-        buttonGroup1.add(jRadioButton2);
-        buttonGroup1.add(jRadioButton3);
-        buttonGroup1.add(jRadioButton4);
-        // Establecer action commands
-        radioRelief.setActionCommand("RELIEF");
-        jRadioButton2.setActionCommand("TECNICA2");
-        jRadioButton3.setActionCommand("TECNICA3");
-        jRadioButton4.setActionCommand("TECNICA4");
-    }
+    initComponents();
+    controlador = new ControladorTecnicas();
+    controladorClasif = new ControladorClasificacion();
+    
+    // NO agregues nada más aquí
+}
     
     private void buscarDataset() {
         JFileChooser selector = new JFileChooser();
@@ -57,45 +52,113 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     }
 
     private void ejecutarTecnica() {
-        if (dataset == null) {
-            JOptionPane.showMessageDialog(this,"Primero debes cargar un dataset.","Error",JOptionPane.ERROR_MESSAGE );
+    
+    if (dataset == null) {
+        JOptionPane.showMessageDialog(this,"Primero debes cargar un dataset.","Error",JOptionPane.ERROR_MESSAGE );
+        return;
+    }
+
+    // Encontrar qué botón está seleccionado por su texto
+    String tecnicaSeleccionada = "";
+    
+    if (radioRelief.isSelected()) {
+        tecnicaSeleccionada = "RELIEF";
+    } else if (radioFisher.isSelected()) {
+        tecnicaSeleccionada = "CORRELATION"; // Cambiado de FISHER a CORRELATION
+    } else if (jRadioButton3.isSelected()) {
+        tecnicaSeleccionada = "GREEDY";
+    } else if (jRadioButton4.isSelected()) {
+        tecnicaSeleccionada = "TECNICA4";
+    } else {
+        JOptionPane.showMessageDialog(this,"Selecciona una técnica.","Información",JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    System.out.println("Técnica seleccionada: " + tecnicaSeleccionada);
+    
+    // Validación para Correlation Score
+    if (tecnicaSeleccionada.equals("CORRELATION")) { // Cambiado de FISHER a CORRELATION
+        int claseIndex = dataset.getNumAtributos() - 1;
+        if (dataset.getTipoColumna(claseIndex) != 'N') { // Cambiado de 'C' a 'N'
+            JOptionPane.showMessageDialog(this,
+                "Correlation Score requiere que la clase (última columna) sea numérica.",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
             return;
-        }
-
-        String tecnicaSeleccionada = "";
-
-        if (radioRelief.isSelected()) {
-            tecnicaSeleccionada = "RELIEF";
-        } else if (jRadioButton2.isSelected()) {
-            tecnicaSeleccionada = "TECNICA2"; 
-        } else if (jRadioButton3.isSelected()) {
-            tecnicaSeleccionada = "TECNICA3";
-        } else if (jRadioButton4.isSelected()) {
-            tecnicaSeleccionada = "INFOGAIN"; 
-        } else {
-            JOptionPane.showMessageDialog(this,"Selecciona una técnica.","Información",JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        if (tecnicaSeleccionada.equals("INFOGAIN")) {
-            int claseIndex = dataset.getNumAtributos() - 1;
-            if (dataset.getTipoColumna(claseIndex) != 'C') {
-                JOptionPane.showMessageDialog(this,
-                    "Information Gain requiere que la clase (última columna) sea categórica.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
-
-        Resultado resultado = controlador.ejecutarTecnica(tecnicaSeleccionada, dataset);
-
-        if (resultado != null) {
-            txtAreaResultados.setText(resultado.generarReporte());
-        } else {
-            txtAreaResultados.setText("Error al ejecutar la técnica.");
         }
     }
+    
+    Resultado resultado = controlador.ejecutarTecnica(tecnicaSeleccionada, dataset);
+
+    if (resultado != null) {
+        txtAreaResultados.setText(resultado.generarReporte());
+    } else {
+        txtAreaResultados.setText("Error al ejecutar la técnica.");
+    }
+}
+    
+    private void ejecutarClasificacion() {
+    
+    if (dataset == null) {
+        JOptionPane.showMessageDialog(this, 
+            "Primero debes cargar un dataset.", 
+            "Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // Determinar qué clasificador está seleccionado
+    String clasificadorSeleccionado = "";
+    
+    if (radioRelief1.isSelected()) { // NaiveBayes
+        clasificadorSeleccionado = "NAIVEBAYES";
+    } else if (radioFisher1.isSelected()) {
+        clasificadorSeleccionado = "J48";
+    } else if (jRadioButton5.isSelected()) {
+        clasificadorSeleccionado = "TECNICA3";
+    } else if (jRadioButton6.isSelected()) {
+        clasificadorSeleccionado = "TECNICA4";
+    } else {
+        JOptionPane.showMessageDialog(this, 
+            "Selecciona un clasificador.", 
+            "Información", 
+            JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    System.out.println("Clasificador seleccionado: " + clasificadorSeleccionado);
+    
+    // Validar que la clase sea categórica para NaiveBayes
+    int claseIndex = dataset.getNumAtributos() - 1;
+    if (dataset.getTipoColumna(claseIndex) != 'C') {
+        JOptionPane.showMessageDialog(this,
+            "NaiveBayes requiere que la clase (última columna) sea categórica.",
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+    
+    try {
+        ResultadoClasificacion resultado = controladorClasif.ejecutarClasificador(clasificadorSeleccionado, dataset);
+        
+        if (resultado != null) {
+            txtAreaResultados1.setText(resultado.generarReporte());
+            JOptionPane.showMessageDialog(this,
+                "Clasificación completada.\nPrecisión: " + String.format("%.2f%%", resultado.getPrecision() * 100),
+                "Éxito",
+                JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            txtAreaResultados1.setText("Error al ejecutar el clasificador.");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        txtAreaResultados1.setText("ERROR: " + e.getMessage());
+        JOptionPane.showMessageDialog(this,
+            "Error al ejecutar: " + e.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+    }
+}
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -111,13 +174,21 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         PanelPestañas = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         radioRelief = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
+        radioFisher = new javax.swing.JRadioButton();
         jRadioButton3 = new javax.swing.JRadioButton();
         jRadioButton4 = new javax.swing.JRadioButton();
         btnIniciar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtAreaResultados = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        radioRelief1 = new javax.swing.JRadioButton();
+        radioFisher1 = new javax.swing.JRadioButton();
+        jRadioButton5 = new javax.swing.JRadioButton();
+        jRadioButton6 = new javax.swing.JRadioButton();
+        btnIniciar2 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtAreaResultados1 = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -140,7 +211,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
         infoLbl.setText("Info...");
 
-        PanelPestañas.setBorder(javax.swing.BorderFactory.createLineBorder(null));
+        PanelPestañas.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         radioRelief.setText("Relief");
         radioRelief.addActionListener(new java.awt.event.ActionListener() {
@@ -149,21 +220,21 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             }
         });
 
-        jRadioButton2.setText("Greedy Stepwise");
-        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+        radioFisher.setText("CorrelationScore");
+        radioFisher.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton2ActionPerformed(evt);
+                radioFisherActionPerformed(evt);
             }
         });
 
-        jRadioButton3.setText("Tecnica 3");
+        jRadioButton3.setText("GreedyStepwise");
         jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton3ActionPerformed(evt);
             }
         });
 
-        jRadioButton4.setText("Information Gain");
+        jRadioButton4.setText("Tecnica 4");
 
         btnIniciar.setText("Iniciar");
         btnIniciar.addActionListener(new java.awt.event.ActionListener() {
@@ -174,6 +245,15 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
         txtAreaResultados.setColumns(20);
         txtAreaResultados.setRows(5);
+        txtAreaResultados.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+                txtAreaResultadosAncestorAdded(evt);
+            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
         jScrollPane1.setViewportView(txtAreaResultados);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -183,11 +263,11 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
                 .addComponent(radioRelief)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jRadioButton2)
-                .addGap(14, 14, 14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioFisher)
+                .addGap(18, 18, 18)
                 .addComponent(jRadioButton3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(21, 21, 21)
                 .addComponent(jRadioButton4)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -203,7 +283,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(radioRelief)
-                    .addComponent(jRadioButton2)
+                    .addComponent(radioFisher)
                     .addComponent(jRadioButton3)
                     .addComponent(jRadioButton4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -215,15 +295,101 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
         PanelPestañas.addTab("Preprocesamiento", jPanel1);
 
+        radioRelief1.setText("NaiveBayes");
+        radioRelief1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioRelief1ActionPerformed(evt);
+            }
+        });
+
+        radioFisher1.setText("J48");
+        radioFisher1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                radioFisher1ActionPerformed(evt);
+            }
+        });
+
+        jRadioButton5.setText("Tecnica 3");
+        jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton5ActionPerformed(evt);
+            }
+        });
+
+        jRadioButton6.setText("Tecnica 4");
+
+        btnIniciar2.setText("Iniciar");
+        btnIniciar2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIniciar2ActionPerformed(evt);
+            }
+        });
+
+        txtAreaResultados1.setColumns(20);
+        txtAreaResultados1.setRows(5);
+        txtAreaResultados1.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+                txtAreaResultados1AncestorAdded(evt);
+            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
+        jScrollPane2.setViewportView(txtAreaResultados1);
+
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(radioRelief1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(radioFisher1)
+                .addGap(28, 28, 28)
+                .addComponent(jRadioButton5)
+                .addGap(18, 18, 18)
+                .addComponent(jRadioButton6)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addGap(0, 6, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(btnIniciar2)
+                .addGap(26, 26, 26))
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel6Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(radioRelief1)
+                    .addComponent(radioFisher1)
+                    .addComponent(jRadioButton5)
+                    .addComponent(jRadioButton6))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnIniciar2)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(25, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 733, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 297, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         PanelPestañas.addTab("Clasificación supervisada", jPanel2);
@@ -330,13 +496,37 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
     }//GEN-LAST:event_radioReliefActionPerformed
 
+    private void txtAreaResultadosAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_txtAreaResultadosAncestorAdded
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAreaResultadosAncestorAdded
+
+    private void radioFisherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioFisherActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_radioFisherActionPerformed
+
+    private void radioRelief1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioRelief1ActionPerformed
+        ejecutarClasificacion();
+    }//GEN-LAST:event_radioRelief1ActionPerformed
+
+    private void radioFisher1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioFisher1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_radioFisher1ActionPerformed
+
+    private void btnIniciar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciar2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnIniciar2ActionPerformed
+
+    private void txtAreaResultados1AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_txtAreaResultados1AncestorAdded
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAreaResultados1AncestorAdded
+
     private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
-    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+    private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
+    }//GEN-LAST:event_jRadioButton5ActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -373,6 +563,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane PanelPestañas;
     private javax.swing.JButton btnIniciar;
+    private javax.swing.JButton btnIniciar2;
     private javax.swing.JButton buscarBtn;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel infoLbl;
@@ -381,16 +572,23 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JRadioButton jRadioButton4;
+    private javax.swing.JRadioButton jRadioButton5;
+    private javax.swing.JRadioButton jRadioButton6;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField nombreDatasetLbl;
+    private javax.swing.JRadioButton radioFisher;
+    private javax.swing.JRadioButton radioFisher1;
     private javax.swing.JRadioButton radioRelief;
+    private javax.swing.JRadioButton radioRelief1;
     private javax.swing.JLabel seleccionDatasetLbl;
     private javax.swing.JLabel tituloLbl;
     private javax.swing.JTextArea txtAreaResultados;
+    private javax.swing.JTextArea txtAreaResultados1;
     // End of variables declaration//GEN-END:variables
 }
