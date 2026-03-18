@@ -10,6 +10,7 @@ public class ControladorTecnicas {
         Tecnica tecnica = null;
 
         switch (nombreTecnica) {
+            case "RELIEFF":
             case "RELIEF":
                 tecnica = new ReliefF();
                 break;
