@@ -25,12 +25,6 @@ public class ControladorTecnicas {
             case "INFOGAIN":
                 tecnica = new InformationGain();
                 break;
-
-            // luego agregas:
-            // case "GOWER":
-            // tecnica = new Gower();
-            // break;
-            
         }
 
         if (tecnica == null) {

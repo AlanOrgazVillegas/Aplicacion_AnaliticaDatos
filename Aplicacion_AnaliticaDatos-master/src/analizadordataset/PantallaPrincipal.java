@@ -19,12 +19,29 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     initComponents();
     controlador = new ControladorTecnicas();
     controladorClasif = new ControladorClasificacion();
+    buttonGroup1 = new javax.swing.ButtonGroup();
+    buttonGroup1.add(radioRelief);
+    buttonGroup1.add(CorrelationScore_radio);
+    buttonGroup1.add(GreedyStepwise_radio);
+    buttonGroup1.add(InformationGain);
+    // Establecer action commands
+    radioRelief.setActionCommand("RELIEF");
+    CorrelationScore_radio.setActionCommand("CORRELATION");
+    GreedyStepwise_radio.setActionCommand("GREEDY");
+    InformationGain.setActionCommand("INFOGAIN");
     
-   ButtonGroup grupoClasificacion = new ButtonGroup();
-    grupoClasificacion.add(radioRelief1);
-    grupoClasificacion.add(radioFisher1);
-    grupoClasificacion.add(jRadioButton5);
-    grupoClasificacion.add(jRadioButton6);
+    // Segundo grupo de botones para supervisada
+    buttonGroup2 = new javax.swing.ButtonGroup();
+    buttonGroup2.add(NaiveBayes_radio);
+    buttonGroup2.add(J48_radio);
+    buttonGroup2.add(KNN_radio);
+    buttonGroup2.add(Reg_Log_radio);
+    //action commands para supervisada
+    NaiveBayes_radio.setActionCommand("NAIVEBAYES");
+    J48_radio.setActionCommand("J48");
+    KNN_radio.setActionCommand("KNN");
+    Reg_Log_radio.setActionCommand("REGRESION_LOGISTICA");
+    
 }
     
     private void buscarDataset() {
@@ -67,11 +84,11 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     
     if (radioRelief.isSelected()) {
         tecnicaSeleccionada = "RELIEF";
-    } else if (radioFisher.isSelected()) {
+    } else if (CorrelationScore_radio.isSelected()) {
         tecnicaSeleccionada = "CORRELATION"; // Cambiado de FISHER a CORRELATION
-    } else if (jRadioButton3.isSelected()) {
+    } else if (GreedyStepwise_radio.isSelected()) {
         tecnicaSeleccionada = "GREEDY";
-    } else if (jRadioButton4.isSelected()) {
+    } else if (InformationGain.isSelected()) {
         tecnicaSeleccionada = "INFOGAIN";
     } else {
         JOptionPane.showMessageDialog(this,"Selecciona una técnica.","Información",JOptionPane.WARNING_MESSAGE);
@@ -126,13 +143,13 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     // Determinar qué clasificador está seleccionado
     String clasificadorSeleccionado = "";
     
-    if (radioRelief1.isSelected()) {
+    if (NaiveBayes_radio.isSelected()) {
         clasificadorSeleccionado = "NAIVEBAYES";
-    } else if (radioFisher1.isSelected()) {
+    } else if (J48_radio.isSelected()) {
         clasificadorSeleccionado = "J48";
-    } else if (jRadioButton5.isSelected()) {
+    } else if (KNN_radio.isSelected()) {
         clasificadorSeleccionado = "KNN";
-    } else if (jRadioButton6.isSelected()) {
+    } else if (Reg_Log_radio.isSelected()) {
     clasificadorSeleccionado = "REGRESIONLOGISTICA";
     } else {
         JOptionPane.showMessageDialog(this, 
@@ -177,6 +194,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         seleccionDatasetLbl = new javax.swing.JLabel();
         nombreDatasetLbl = new javax.swing.JTextField();
         buscarBtn = new javax.swing.JButton();
@@ -186,18 +204,18 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         PanelPestañas = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         radioRelief = new javax.swing.JRadioButton();
-        radioFisher = new javax.swing.JRadioButton();
-        jRadioButton3 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
+        CorrelationScore_radio = new javax.swing.JRadioButton();
+        GreedyStepwise_radio = new javax.swing.JRadioButton();
+        InformationGain = new javax.swing.JRadioButton();
         btnIniciar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtAreaResultados = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
-        radioRelief1 = new javax.swing.JRadioButton();
-        radioFisher1 = new javax.swing.JRadioButton();
-        jRadioButton5 = new javax.swing.JRadioButton();
-        jRadioButton6 = new javax.swing.JRadioButton();
+        NaiveBayes_radio = new javax.swing.JRadioButton();
+        J48_radio = new javax.swing.JRadioButton();
+        KNN_radio = new javax.swing.JRadioButton();
+        Reg_Log_radio = new javax.swing.JRadioButton();
         btnIniciar2 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtAreaResultados1 = new javax.swing.JTextArea();
@@ -232,21 +250,21 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             }
         });
 
-        radioFisher.setText("CorrelationScore");
-        radioFisher.addActionListener(new java.awt.event.ActionListener() {
+        CorrelationScore_radio.setText("CorrelationScore");
+        CorrelationScore_radio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioFisherActionPerformed(evt);
+                CorrelationScore_radioActionPerformed(evt);
             }
         });
 
-        jRadioButton3.setText("GreedyStepwise");
-        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
+        GreedyStepwise_radio.setText("GreedyStepwise");
+        GreedyStepwise_radio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton3ActionPerformed(evt);
+                GreedyStepwise_radioActionPerformed(evt);
             }
         });
 
-        jRadioButton4.setText("Information Gain");
+        InformationGain.setText("Information Gain");
 
         btnIniciar.setText("Iniciar");
         btnIniciar.addActionListener(new java.awt.event.ActionListener() {
@@ -276,11 +294,11 @@ public class PantallaPrincipal extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addComponent(radioRelief)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(radioFisher)
+                .addComponent(CorrelationScore_radio)
                 .addGap(18, 18, 18)
-                .addComponent(jRadioButton3)
+                .addComponent(GreedyStepwise_radio)
                 .addGap(21, 21, 21)
-                .addComponent(jRadioButton4)
+                .addComponent(InformationGain)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(0, 6, Short.MAX_VALUE)
@@ -295,9 +313,9 @@ public class PantallaPrincipal extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(radioRelief)
-                    .addComponent(radioFisher)
-                    .addComponent(jRadioButton3)
-                    .addComponent(jRadioButton4))
+                    .addComponent(CorrelationScore_radio)
+                    .addComponent(GreedyStepwise_radio)
+                    .addComponent(InformationGain))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnIniciar)
@@ -307,31 +325,31 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
         PanelPestañas.addTab("Preprocesamiento", jPanel1);
 
-        radioRelief1.setText("NaiveBayes");
-        radioRelief1.addActionListener(new java.awt.event.ActionListener() {
+        NaiveBayes_radio.setText("NaiveBayes");
+        NaiveBayes_radio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioRelief1ActionPerformed(evt);
+                NaiveBayes_radioActionPerformed(evt);
             }
         });
 
-        radioFisher1.setText("J48");
-        radioFisher1.addActionListener(new java.awt.event.ActionListener() {
+        J48_radio.setText("J48");
+        J48_radio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioFisher1ActionPerformed(evt);
+                J48_radioActionPerformed(evt);
             }
         });
 
-        jRadioButton5.setText("KNN");
-        jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
+        KNN_radio.setText("KNN");
+        KNN_radio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton5ActionPerformed(evt);
+                KNN_radioActionPerformed(evt);
             }
         });
 
-        jRadioButton6.setText("Regresion Logistica");
-        jRadioButton6.addActionListener(new java.awt.event.ActionListener() {
+        Reg_Log_radio.setText("Regresion Logistica");
+        Reg_Log_radio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton6ActionPerformed(evt);
+                Reg_Log_radioActionPerformed(evt);
             }
         });
 
@@ -361,13 +379,13 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
-                .addComponent(radioRelief1)
+                .addComponent(NaiveBayes_radio)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(radioFisher1)
+                .addComponent(J48_radio)
                 .addGap(28, 28, 28)
-                .addComponent(jRadioButton5)
+                .addComponent(KNN_radio)
                 .addGap(18, 18, 18)
-                .addComponent(jRadioButton6)
+                .addComponent(Reg_Log_radio)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addGap(0, 6, Short.MAX_VALUE)
@@ -381,10 +399,10 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radioRelief1)
-                    .addComponent(radioFisher1)
-                    .addComponent(jRadioButton5)
-                    .addComponent(jRadioButton6))
+                    .addComponent(NaiveBayes_radio)
+                    .addComponent(J48_radio)
+                    .addComponent(KNN_radio)
+                    .addComponent(Reg_Log_radio))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnIniciar2)
@@ -517,17 +535,17 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtAreaResultadosAncestorAdded
 
-    private void radioFisherActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioFisherActionPerformed
+    private void CorrelationScore_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CorrelationScore_radioActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_radioFisherActionPerformed
+    }//GEN-LAST:event_CorrelationScore_radioActionPerformed
 
-    private void radioRelief1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioRelief1ActionPerformed
+    private void NaiveBayes_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NaiveBayes_radioActionPerformed
     System.out.println("NaiveBayes seleccionado");
-    }//GEN-LAST:event_radioRelief1ActionPerformed
+    }//GEN-LAST:event_NaiveBayes_radioActionPerformed
 
-    private void radioFisher1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioFisher1ActionPerformed
+    private void J48_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_J48_radioActionPerformed
     System.out.println("J48 seleccionado");
-    }//GEN-LAST:event_radioFisher1ActionPerformed
+    }//GEN-LAST:event_J48_radioActionPerformed
 
     private void btnIniciar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciar2ActionPerformed
          ejecutarClasificacion();
@@ -537,17 +555,17 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtAreaResultados1AncestorAdded
 
-    private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
+    private void GreedyStepwise_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GreedyStepwise_radioActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioButton3ActionPerformed
+    }//GEN-LAST:event_GreedyStepwise_radioActionPerformed
 
-    private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
+    private void KNN_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KNN_radioActionPerformed
         System.out.println("KNN seleccionado");
-    }//GEN-LAST:event_jRadioButton5ActionPerformed
+    }//GEN-LAST:event_KNN_radioActionPerformed
 
-    private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton6ActionPerformed
+    private void Reg_Log_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Reg_Log_radioActionPerformed
         System.out.println("Regresion Logistica seleccionada");
-    }//GEN-LAST:event_jRadioButton6ActionPerformed
+    }//GEN-LAST:event_Reg_Log_radioActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -582,11 +600,19 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton CorrelationScore_radio;
+    private javax.swing.JRadioButton GreedyStepwise_radio;
+    private javax.swing.JRadioButton InformationGain;
+    private javax.swing.JRadioButton J48_radio;
+    private javax.swing.JRadioButton KNN_radio;
+    private javax.swing.JRadioButton NaiveBayes_radio;
     private javax.swing.JTabbedPane PanelPestañas;
+    private javax.swing.JRadioButton Reg_Log_radio;
     private javax.swing.JButton btnIniciar;
     private javax.swing.JButton btnIniciar2;
     private javax.swing.JButton buscarBtn;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JLabel infoLbl;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -594,19 +620,12 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
-    private javax.swing.JRadioButton jRadioButton5;
-    private javax.swing.JRadioButton jRadioButton6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField nombreDatasetLbl;
-    private javax.swing.JRadioButton radioFisher;
-    private javax.swing.JRadioButton radioFisher1;
     private javax.swing.JRadioButton radioRelief;
-    private javax.swing.JRadioButton radioRelief1;
     private javax.swing.JLabel seleccionDatasetLbl;
     private javax.swing.JLabel tituloLbl;
     private javax.swing.JTextArea txtAreaResultados;
