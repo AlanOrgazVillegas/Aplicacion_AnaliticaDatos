@@ -330,7 +330,7 @@
                 </Component>
                 <Component class="javax.swing.JRadioButton" name="jRadioButton5">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Tecnica 3"/>
+                    <Property name="text" type="java.lang.String" value="KNN"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButton5ActionPerformed"/>
@@ -338,8 +338,11 @@
                 </Component>
                 <Component class="javax.swing.JRadioButton" name="jRadioButton6">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Tecnica 4"/>
+                    <Property name="text" type="java.lang.String" value="Regresion Logistica"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButton6ActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnIniciar2">
                   <Properties>

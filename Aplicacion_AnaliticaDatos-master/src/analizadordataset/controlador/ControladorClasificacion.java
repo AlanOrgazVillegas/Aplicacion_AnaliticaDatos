@@ -17,6 +17,15 @@ public class ControladorClasificacion {
             case "J48":
                 clasificador = new J48();
                 break;
+                
+            case "KNN":
+                clasificador = new KNN();
+                break;
+                
+           case "REGRESIONLOGISTICA":  
+            case "REGRESION_LOGISTICA": 
+                clasificador = new RegresionLogistica();
+                break;
         }
         
         if (clasificador == null) {

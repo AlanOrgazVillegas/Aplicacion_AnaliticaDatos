@@ -35,38 +35,61 @@ public class ResultadoClasificacion {
     }
     
     public String generarReporte() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(nombre).append(" ===\n\n");
+    StringBuilder sb = new StringBuilder();
+    sb.append("=== ").append(nombre).append(" ===\n\n");
+    
+    sb.append("Métricas:\n");
+    for (Map.Entry<String, String> entry : metricas.entrySet()) {
+        sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+    }
+    sb.append("\n");
+    
+    if (matrizConfusion != null && clases != null) {
+        sb.append("MATRIZ DE CONFUSIÓN\n");
+        sb.append("===================\n\n");
         
-        sb.append("Métricas:\n");
-        for (Map.Entry<String, String> entry : metricas.entrySet()) {
-            sb.append("  ").append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        // Determinar el ancho máximo de los nombres de clase (máximo 10 caracteres)
+        int anchoMaximo = 10;
+        
+        // Encabezado - mostrar solo índices en lugar de nombres largos
+        sb.append("     "); // Espacio para la columna de clases reales
+        for (int i = 0; i < clases.length; i++) {
+            sb.append(String.format("%4d ", i + 1));
         }
         sb.append("\n");
         
-        if (matrizConfusion != null && clases != null) {
-            sb.append("Matriz de Confusión:\n");
-            sb.append("==================\n\n");
+        // Línea separadora
+        sb.append("     ");
+        for (int i = 0; i < clases.length; i++) {
+            sb.append("-----");
+        }
+        sb.append("\n");
+        
+        // Filas de la matriz
+        for (int i = 0; i < matrizConfusion.length; i++) {
+            // Mostrar índice de la clase real en lugar del nombre completo
+            sb.append(String.format("%3d |", i + 1));
             
-            // Encabezado
-            sb.append("     ");
-            for (String clase : clases) {
-                sb.append(String.format("%-10s", clase));
+            for (int j = 0; j < matrizConfusion[i].length; j++) {
+                sb.append(String.format("%4.0f ", matrizConfusion[i][j]));
             }
             sb.append("\n");
-            
-            // Filas
-            for (int i = 0; i < matrizConfusion.length; i++) {
-                sb.append(String.format("%-5s", clases[i]));
-                for (int j = 0; j < matrizConfusion[i].length; j++) {
-                    sb.append(String.format("%-10.0f", matrizConfusion[i][j]));
-                }
-                sb.append("\n");
-            }
         }
         
-        return sb.toString();
+        sb.append("\n");
+        
+        // Leyenda de clases (abajo de la matriz)
+        sb.append("Leyenda de clases:\n");
+        for (int i = 0; i < clases.length; i++) {
+            String nombreCorto = clases[i].length() > 25 ? 
+                clases[i].substring(0, 22) + "..." : 
+                clases[i];
+            sb.append(String.format("  %d = %s\n", i + 1, nombreCorto));
+        }
     }
+    
+    return sb.toString();
+}
     
     // Getters
     public String getNombre() { return nombre; }

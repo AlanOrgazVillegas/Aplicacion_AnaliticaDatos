@@ -20,7 +20,11 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     controlador = new ControladorTecnicas();
     controladorClasif = new ControladorClasificacion();
     
-    // NO agregues nada más aquí
+   ButtonGroup grupoClasificacion = new ButtonGroup();
+    grupoClasificacion.add(radioRelief1);
+    grupoClasificacion.add(radioFisher1);
+    grupoClasificacion.add(jRadioButton5);
+    grupoClasificacion.add(jRadioButton6);
 }
     
     private void buscarDataset() {
@@ -122,14 +126,14 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     // Determinar qué clasificador está seleccionado
     String clasificadorSeleccionado = "";
     
-    if (radioRelief1.isSelected()) { // NaiveBayes
+    if (radioRelief1.isSelected()) {
         clasificadorSeleccionado = "NAIVEBAYES";
     } else if (radioFisher1.isSelected()) {
         clasificadorSeleccionado = "J48";
     } else if (jRadioButton5.isSelected()) {
-        clasificadorSeleccionado = "TECNICA3";
+        clasificadorSeleccionado = "KNN";
     } else if (jRadioButton6.isSelected()) {
-        clasificadorSeleccionado = "TECNICA4";
+    clasificadorSeleccionado = "REGRESIONLOGISTICA";
     } else {
         JOptionPane.showMessageDialog(this, 
             "Selecciona un clasificador.", 
@@ -140,11 +144,11 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     
     System.out.println("Clasificador seleccionado: " + clasificadorSeleccionado);
     
-    // Validar que la clase sea categórica para NaiveBayes
+    // Validar que la clase sea categórica (todos los clasificadores la requieren)
     int claseIndex = dataset.getNumAtributos() - 1;
     if (dataset.getTipoColumna(claseIndex) != 'C') {
         JOptionPane.showMessageDialog(this,
-            "NaiveBayes requiere que la clase (última columna) sea categórica.",
+            "Los clasificadores requieren que la clase (última columna) sea categórica.",
             "Error",
             JOptionPane.ERROR_MESSAGE);
         return;
@@ -155,12 +159,8 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         
         if (resultado != null) {
             txtAreaResultados1.setText(resultado.generarReporte());
-            JOptionPane.showMessageDialog(this,
-                "Clasificación completada.\nPrecisión: " + String.format("%.2f%%", resultado.getPrecision() * 100),
-                "Éxito",
-                JOptionPane.INFORMATION_MESSAGE);
         } else {
-            txtAreaResultados1.setText("Error al ejecutar el clasificador.");
+            txtAreaResultados1.setText("Error: El clasificador no está implementado.");
         }
     } catch (Exception e) {
         e.printStackTrace();
@@ -321,14 +321,19 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             }
         });
 
-        jRadioButton5.setText("Tecnica 3");
+        jRadioButton5.setText("KNN");
         jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton5ActionPerformed(evt);
             }
         });
 
-        jRadioButton6.setText("Tecnica 4");
+        jRadioButton6.setText("Regresion Logistica");
+        jRadioButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton6ActionPerformed(evt);
+            }
+        });
 
         btnIniciar2.setText("Iniciar");
         btnIniciar2.addActionListener(new java.awt.event.ActionListener() {
@@ -517,15 +522,15 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_radioFisherActionPerformed
 
     private void radioRelief1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioRelief1ActionPerformed
-        ejecutarClasificacion();
+    System.out.println("NaiveBayes seleccionado");
     }//GEN-LAST:event_radioRelief1ActionPerformed
 
     private void radioFisher1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioFisher1ActionPerformed
-        // TODO add your handling code here:
+    System.out.println("J48 seleccionado");
     }//GEN-LAST:event_radioFisher1ActionPerformed
 
     private void btnIniciar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciar2ActionPerformed
-        // TODO add your handling code here:
+         ejecutarClasificacion();
     }//GEN-LAST:event_btnIniciar2ActionPerformed
 
     private void txtAreaResultados1AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_txtAreaResultados1AncestorAdded
@@ -537,8 +542,12 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jRadioButton3ActionPerformed
 
     private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
-        // TODO add your handling code here:
+        System.out.println("KNN seleccionado");
     }//GEN-LAST:event_jRadioButton5ActionPerformed
+
+    private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton6ActionPerformed
+        System.out.println("Regresion Logistica seleccionada");
+    }//GEN-LAST:event_jRadioButton6ActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
