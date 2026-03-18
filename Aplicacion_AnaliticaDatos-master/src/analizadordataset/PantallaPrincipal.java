@@ -9,12 +9,16 @@ import analizadordataset.metricas.Gower;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
+import analizadordataset.modelo.AtributoRanking;
+import java.util.List;
 
 public class PantallaPrincipal extends javax.swing.JFrame {
 
     private Dataset dataset;
     private ControladorTecnicas controlador;
     private ControladorClasificacion controladorClasif;
+    private Dataset datasetOriginal;
+   private List<AtributoRanking> ultimoRanking;
     
     public PantallaPrincipal() {
     initComponents();
@@ -134,11 +138,15 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     
     Resultado resultado = controlador.ejecutarTecnica(tecnicaSeleccionada, dataset);
 
-    if (resultado != null) {
-        txtAreaResultados.setText(resultado.generarReporte());
-    } else {
-        txtAreaResultados.setText("Error al ejecutar la técnica.");
-    }
+if (resultado != null) {
+    txtAreaResultados.setText(resultado.generarReporte());
+    
+    // GUARDAR EL RANKING PARA USARLO DESPUÉS EN RESULTADOS
+    ultimoRanking = resultado.getRanking();
+    
+} else {
+    txtAreaResultados.setText("Error al ejecutar la técnica.");
+}
 }
     
     private void ejecutarClasificacion() {
@@ -199,6 +207,79 @@ public class PantallaPrincipal extends javax.swing.JFrame {
             JOptionPane.ERROR_MESSAGE);
     }
 }
+    private void compararResultados() {
+    if (datasetOriginal == null || dataset == null) {
+        JOptionPane.showMessageDialog(this, 
+            "Primero debes eliminar atributos para tener un dataset reducido.", 
+            "Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    if (ultimoRanking == null || ultimoRanking.isEmpty()) {
+        JOptionPane.showMessageDialog(this, 
+            "Primero ejecuta una técnica de selección para tener el ranking.", 
+            "Error", 
+            JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    StringBuilder reporte = new StringBuilder();
+    reporte.append("=== COMPARACIÓN: DATASET ORIGINAL VS REDUCIDO ===\n\n");
+    
+    // Información general
+    reporte.append("DATASET ORIGINAL:\n");
+    reporte.append("  • Instancias: ").append(datasetOriginal.getNumInstancias()).append("\n");
+    reporte.append("  • Atributos: ").append(datasetOriginal.getNumAtributos()).append("\n\n");
+    
+    reporte.append("DATASET REDUCIDO:\n");
+    reporte.append("  • Instancias: ").append(dataset.getNumInstancias()).append("\n");
+    reporte.append("  • Atributos: ").append(dataset.getNumAtributos()).append("\n\n");
+    
+    // Atributos eliminados
+    reporte.append("ATRIBUTOS ELIMINADOS:\n");
+    String[] nombresOriginales = datasetOriginal.getNombresColumnas();
+    String[] nombresReducidos = dataset.getNombresColumnas();
+    
+    // Encontrar cuáles faltan en el reducido
+    for (String original : nombresOriginales) {
+        boolean encontrado = false;
+        for (String reducido : nombresReducidos) {
+            if (original.equals(reducido)) {
+                encontrado = true;
+                break;
+            }
+        }
+        if (!encontrado) {
+            reporte.append("  • ").append(original).append("\n");
+        }
+    }
+    reporte.append("\n");
+    
+    // Ranking de importancia (si existe)
+    if (ultimoRanking != null && !ultimoRanking.isEmpty()) {
+        reporte.append("RANKING DE IMPORTANCIA (técnica usada):\n");
+        for (int i = 0; i < Math.min(10, ultimoRanking.size()); i++) {
+            AtributoRanking attr = ultimoRanking.get(i);
+            reporte.append(String.format("  %d. %s: %.6f", i+1, attr.getNombreAtributo(), attr.getPeso()));
+            
+            // Marcar si fue eliminado
+            boolean eliminado = true;
+            for (String nombre : nombresReducidos) {
+                if (nombre.equals(attr.getNombreAtributo())) {
+                    eliminado = false;
+                    break;
+                }
+            }
+            if (eliminado) {
+                reporte.append(" (ELIMINADO)");
+            }
+            reporte.append("\n");
+        }
+    }
+    
+    txtResultadosGower1.setText(reporte.toString());
+}
     
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -242,6 +323,9 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         txtResultadosGower = new javax.swing.JTextArea();
         jPanel5 = new javax.swing.JPanel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        txtResultadosGower1 = new javax.swing.JTextArea();
+        btnIniciar1 = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -482,7 +566,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 917, Short.MAX_VALUE)
+            .addGap(0, 918, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -515,7 +599,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 193, Short.MAX_VALUE)
                         .addComponent(btnIniciarGower))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(radioGowerSimilitud)
@@ -544,19 +628,42 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
         PanelPestañas.addTab("Gower", jPanel4);
 
+        txtResultadosGower1.setColumns(20);
+        txtResultadosGower1.setRows(5);
+        jScrollPane5.setViewportView(txtResultadosGower1);
+
+        btnIniciar1.setText("Iniciar");
+        btnIniciar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIniciar1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 917, Short.MAX_VALUE)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 148, Short.MAX_VALUE)
+                .addComponent(btnIniciar1)
+                .addGap(51, 51, 51))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 297, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addGap(33, 33, 33)
+                .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addGap(45, 45, 45)
+                .addComponent(btnIniciar1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         PanelPestañas.addTab("Resultados", jPanel5);
-        PanelPestañas.addTab("Predicción", jTabbedPane1);
+        PanelPestañas.addTab("", jTabbedPane1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -611,142 +718,158 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private void buscarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarBtnActionPerformed
         buscarDataset();
     }//GEN-LAST:event_buscarBtnActionPerformed
-        
-    private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
-        ejecutarTecnica();
-    }//GEN-LAST:event_btnIniciarActionPerformed
 
-    private void radioReliefActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioReliefActionPerformed
+    private void btnIniciar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciar1ActionPerformed
+        compararResultados();
+    }//GEN-LAST:event_btnIniciar1ActionPerformed
 
-    }//GEN-LAST:event_radioReliefActionPerformed
+    private void btnIniciarGowerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarGowerActionPerformed
+        // 1. Validar que haya un dataset cargado
+        if (dataset == null) {
+            JOptionPane.showMessageDialog(this, "Primero debes cargar un dataset.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-    private void txtAreaResultadosAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_txtAreaResultadosAncestorAdded
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtAreaResultadosAncestorAdded
+        // 2. Saber qué eligió el usuario (usa los nombres de variables que le pusiste a tus radios)
+        boolean esSimilitud = radioGowerSimilitud.isSelected();
+        boolean esDistancia = radioGowerDistancia.isSelected();
 
-    private void CorrelationScore_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CorrelationScore_radioActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_CorrelationScore_radioActionPerformed
+        if (!esSimilitud && !esDistancia) {
+            JOptionPane.showMessageDialog(this, "Selecciona Similitud o Distancia.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-    private void NaiveBayes_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NaiveBayes_radioActionPerformed
-    System.out.println("NaiveBayes seleccionado");
-    }//GEN-LAST:event_NaiveBayes_radioActionPerformed
+        // 3. Preparar la pantalla de resultados
+        txtResultadosGower.setText("--- ANÁLISIS DE GOWER ---\n");
+        txtResultadosGower.append("Dataset cargado. Total de instancias: " + dataset.getNumInstancias() + "\n");
 
-    private void J48_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_J48_radioActionPerformed
-    System.out.println("J48 seleccionado");
-    }//GEN-LAST:event_J48_radioActionPerformed
+        if (esSimilitud) {
+            txtResultadosGower.append("Calculando SIMILITUD (1.0 = Idénticos, 0.0 = Diferentes)\n");
+        } else {
+            txtResultadosGower.append("Calculando DISTANCIA (0.0 = Idénticos, 1.0 = Muy lejanos)\n");
+        }
 
-    private void btnIniciar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciar2ActionPerformed
-         ejecutarClasificacion();
-    }//GEN-LAST:event_btnIniciar2ActionPerformed
+        txtResultadosGower.append("Comparando la Fila 0 con el resto...\n");
+        txtResultadosGower.append("--------------------------------------------------\n\n");
+
+        try {
+            // 4. Instanciar nuestra clase lógica
+            Gower gower = new Gower(dataset);
+            int numInstancias = dataset.getNumInstancias();
+
+            // 5. Ciclo para comparar la fila 0 contra todas las demás (empezamos en 1)
+            for (int i = 1; i < numInstancias; i++) {
+                double resultado;
+
+                if (esSimilitud) {
+                    resultado = gower.calcularSimilitud(0, i);
+                    // String.format nos ayuda a que solo salgan 4 decimales para que se vea limpio
+                    txtResultadosGower.append(String.format("Fila 0 vs Fila %d -> %.4f\n", i, resultado));
+                } else {
+                    resultado = gower.calcularDistancia(0, i);
+                    txtResultadosGower.append(String.format("Fila 0 vs Fila %d -> %.4f\n", i, resultado));
+                }
+            }
+
+            txtResultadosGower.append("\n¡Cálculo finalizado exitosamente!");
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al calcular Gower: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnIniciarGowerActionPerformed
 
     private void txtAreaResultados1AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_txtAreaResultados1AncestorAdded
         // TODO add your handling code here:
     }//GEN-LAST:event_txtAreaResultados1AncestorAdded
 
-    private void GreedyStepwise_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GreedyStepwise_radioActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_GreedyStepwise_radioActionPerformed
-
-    private void KNN_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KNN_radioActionPerformed
-        System.out.println("KNN seleccionado");
-    }//GEN-LAST:event_KNN_radioActionPerformed
+    private void btnIniciar2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciar2ActionPerformed
+        ejecutarClasificacion();
+    }//GEN-LAST:event_btnIniciar2ActionPerformed
 
     private void Reg_Log_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Reg_Log_radioActionPerformed
         System.out.println("Regresion Logistica seleccionada");
     }//GEN-LAST:event_Reg_Log_radioActionPerformed
 
-    private void btnIniciarGowerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarGowerActionPerformed
-// 1. Validar que haya un dataset cargado
-    if (dataset == null) {
-        JOptionPane.showMessageDialog(this, "Primero debes cargar un dataset.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
+    private void KNN_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KNN_radioActionPerformed
+        System.out.println("KNN seleccionado");
+    }//GEN-LAST:event_KNN_radioActionPerformed
 
-    // 2. Saber qué eligió el usuario (usa los nombres de variables que le pusiste a tus radios)
-    boolean esSimilitud = radioGowerSimilitud.isSelected();
-    boolean esDistancia = radioGowerDistancia.isSelected();
+    private void J48_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_J48_radioActionPerformed
+        System.out.println("J48 seleccionado");
+    }//GEN-LAST:event_J48_radioActionPerformed
 
-    if (!esSimilitud && !esDistancia) {
-        JOptionPane.showMessageDialog(this, "Selecciona Similitud o Distancia.", "Aviso", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-
-    // 3. Preparar la pantalla de resultados
-    txtResultadosGower.setText("--- ANÁLISIS DE GOWER ---\n");
-    txtResultadosGower.append("Dataset cargado. Total de instancias: " + dataset.getNumInstancias() + "\n");
-    
-    if (esSimilitud) {
-        txtResultadosGower.append("Calculando SIMILITUD (1.0 = Idénticos, 0.0 = Diferentes)\n");
-    } else {
-        txtResultadosGower.append("Calculando DISTANCIA (0.0 = Idénticos, 1.0 = Muy lejanos)\n");
-    }
-    
-    txtResultadosGower.append("Comparando la Fila 0 con el resto...\n");
-    txtResultadosGower.append("--------------------------------------------------\n\n");
-
-    try {
-        // 4. Instanciar nuestra clase lógica
-        Gower gower = new Gower(dataset);
-        int numInstancias = dataset.getNumInstancias();
-
-        // 5. Ciclo para comparar la fila 0 contra todas las demás (empezamos en 1)
-        for (int i = 1; i < numInstancias; i++) {
-            double resultado;
-            
-            if (esSimilitud) {
-                resultado = gower.calcularSimilitud(0, i);
-                // String.format nos ayuda a que solo salgan 4 decimales para que se vea limpio
-                txtResultadosGower.append(String.format("Fila 0 vs Fila %d -> %.4f\n", i, resultado));
-            } else {
-                resultado = gower.calcularDistancia(0, i);
-                txtResultadosGower.append(String.format("Fila 0 vs Fila %d -> %.4f\n", i, resultado));
-            }
-        }
-        
-        txtResultadosGower.append("\n¡Cálculo finalizado exitosamente!");
-        
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error al calcular Gower: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    }
-    }//GEN-LAST:event_btnIniciarGowerActionPerformed
+    private void NaiveBayes_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_NaiveBayes_radioActionPerformed
+        System.out.println("NaiveBayes seleccionado");
+    }//GEN-LAST:event_NaiveBayes_radioActionPerformed
 
     private void btnEliminarAtributosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarAtributosActionPerformed
-if (dataset == null) {
-        JOptionPane.showMessageDialog(this, "Primero carga un dataset.", "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-    }
-
-    // 1. Obtener qué seleccionó el usuario en la lista
-    int[] indicesSeleccionados = listaAtributos.getSelectedIndices();
-    if (indicesSeleccionados.length == 0) {
-        JOptionPane.showMessageDialog(this, "Selecciona al menos una columna de la lista para eliminar.", "Aviso", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-
-    try {
-        // 2. Llamar al nuevo método mágico que recorta el dataset
-        dataset.eliminarColumnas(indicesSeleccionados);
-
-        // 3. Actualizar la etiqueta que muestra cuántos atributos quedan
-        infoLbl.setText("Instancias: " + dataset.getNumInstancias() + " | Atributos: " + dataset.getNumAtributos());
-
-        // 4. Refrescar la lista visual para que desaparezcan las columnas borradas
-        javax.swing.DefaultListModel<String> modeloLista = new javax.swing.DefaultListModel<>();
-        String[] nombresActualizados = dataset.getNombresColumnas();
-        
-        for (int i = 0; i < dataset.getNumAtributos(); i++) {
-            modeloLista.addElement(i + " - " + nombresActualizados[i]);
+        if (dataset == null) {
+            JOptionPane.showMessageDialog(this, "Primero carga un dataset.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-        listaAtributos.setModel(modeloLista);
 
-        JOptionPane.showMessageDialog(this, "Columnas eliminadas correctamente. El dataset ha sido actualizado.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        // GUARDAR COPIA DEL ORIGINAL (si es primera vez)
+        if (datasetOriginal == null) {
+            datasetOriginal = new Dataset();
+            try {
+                // Aquí debes implementar un método para clonar el dataset
+                datasetOriginal = dataset.clonar();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al guardar original: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
 
-    } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "Error al eliminar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-    }
+        // 1. Obtener qué seleccionó el usuario en la lista
+        int[] indicesSeleccionados = listaAtributos.getSelectedIndices();
+        if (indicesSeleccionados.length == 0) {
+            JOptionPane.showMessageDialog(this, "Selecciona al menos una columna de la lista para eliminar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // 2. Llamar al método que elimina columnas
+            dataset.eliminarColumnas(indicesSeleccionados);
+
+            // 3. Actualizar la etiqueta
+            infoLbl.setText("Instancias: " + dataset.getNumInstancias() + " | Atributos: " + dataset.getNumAtributos());
+
+            // 4. Refrescar la lista visual
+            javax.swing.DefaultListModel<String> modeloLista = new javax.swing.DefaultListModel<>();
+            String[] nombresActualizados = dataset.getNombresColumnas();
+
+            for (int i = 0; i < dataset.getNumAtributos(); i++) {
+                modeloLista.addElement(i + " - " + nombresActualizados[i]);
+            }
+            listaAtributos.setModel(modeloLista);
+
+            JOptionPane.showMessageDialog(this, "Columnas eliminadas correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al eliminar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnEliminarAtributosActionPerformed
 
+    private void txtAreaResultadosAncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_txtAreaResultadosAncestorAdded
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAreaResultadosAncestorAdded
+
+    private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
+        ejecutarTecnica();
+    }//GEN-LAST:event_btnIniciarActionPerformed
+
+    private void GreedyStepwise_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GreedyStepwise_radioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_GreedyStepwise_radioActionPerformed
+
+    private void CorrelationScore_radioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CorrelationScore_radioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CorrelationScore_radioActionPerformed
+
+    private void radioReliefActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioReliefActionPerformed
+
+    }//GEN-LAST:event_radioReliefActionPerformed
+        
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -790,6 +913,7 @@ if (dataset == null) {
     private javax.swing.JRadioButton Reg_Log_radio;
     private javax.swing.JButton btnEliminarAtributos;
     private javax.swing.JButton btnIniciar;
+    private javax.swing.JButton btnIniciar1;
     private javax.swing.JButton btnIniciar2;
     private javax.swing.JButton btnIniciarGower;
     private javax.swing.JButton buscarBtn;
@@ -807,6 +931,7 @@ if (dataset == null) {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JList<String> listaAtributos;
@@ -819,5 +944,6 @@ if (dataset == null) {
     private javax.swing.JTextArea txtAreaResultados;
     private javax.swing.JTextArea txtAreaResultados1;
     private javax.swing.JTextArea txtResultadosGower;
+    private javax.swing.JTextArea txtResultadosGower1;
     // End of variables declaration//GEN-END:variables
 }

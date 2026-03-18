@@ -271,4 +271,24 @@ public class Dataset {
         this.datos = nuevosDatos;
         this.numAtributos = nuevoNumAtributos;
     }
+    public Dataset clonar() {
+    Dataset copia = new Dataset();
+    
+    // Copiar nombres de columnas
+    copia.nombresColumnas = this.nombresColumnas.clone();
+    
+    // Copiar tipos de columnas
+    copia.tiposColumnas = this.tiposColumnas.clone();
+    
+    // Copiar datos
+    copia.datos = new ArrayList<>();
+    for (String[] fila : this.datos) {
+        copia.datos.add(fila.clone());
+    }
+    
+    copia.numInstancias = this.numInstancias;
+    copia.numAtributos = this.numAtributos;
+    
+    return copia;
+}
 }
