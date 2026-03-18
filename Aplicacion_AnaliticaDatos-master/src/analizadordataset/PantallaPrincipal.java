@@ -5,6 +5,7 @@ import analizadordataset.modelo.Resultado;
 import analizadordataset.controlador.ControladorTecnicas;
 import analizadordataset.modelo.ResultadoClasificacion;
 import analizadordataset.controlador.ControladorClasificacion;
+import analizadordataset.metricas.Gower;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
@@ -195,6 +196,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
+        buttonGroup3 = new javax.swing.ButtonGroup();
         seleccionDatasetLbl = new javax.swing.JLabel();
         nombreDatasetLbl = new javax.swing.JTextField();
         buscarBtn = new javax.swing.JButton();
@@ -221,6 +223,11 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         txtAreaResultados1 = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
+        radioGowerSimilitud = new javax.swing.JRadioButton();
+        radioGowerDistancia = new javax.swing.JRadioButton();
+        btnIniciarGower = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        txtResultadosGower = new javax.swing.JTextArea();
         jPanel5 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
 
@@ -442,15 +449,55 @@ public class PantallaPrincipal extends javax.swing.JFrame {
 
         PanelPestañas.addTab("Clasificación no supervisada", jPanel3);
 
+        radioGowerSimilitud.setText("Similitud");
+
+        radioGowerDistancia.setText("Distancia");
+
+        btnIniciarGower.setText("Iniciar");
+        btnIniciarGower.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIniciarGowerActionPerformed(evt);
+            }
+        });
+
+        txtResultadosGower.setColumns(20);
+        txtResultadosGower.setRows(5);
+        jScrollPane3.setViewportView(txtResultadosGower);
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 733, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                        .addComponent(btnIniciarGower))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(radioGowerSimilitud)
+                        .addGap(18, 18, 18)
+                        .addComponent(radioGowerDistancia)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 297, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(radioGowerSimilitud)
+                    .addComponent(radioGowerDistancia))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addComponent(btnIniciarGower)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         PanelPestañas.addTab("Gower", jPanel4);
@@ -567,6 +614,61 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         System.out.println("Regresion Logistica seleccionada");
     }//GEN-LAST:event_Reg_Log_radioActionPerformed
 
+    private void btnIniciarGowerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarGowerActionPerformed
+// 1. Validar que haya un dataset cargado
+    if (dataset == null) {
+        JOptionPane.showMessageDialog(this, "Primero debes cargar un dataset.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // 2. Saber qué eligió el usuario (usa los nombres de variables que le pusiste a tus radios)
+    boolean esSimilitud = radioGowerSimilitud.isSelected();
+    boolean esDistancia = radioGowerDistancia.isSelected();
+
+    if (!esSimilitud && !esDistancia) {
+        JOptionPane.showMessageDialog(this, "Selecciona Similitud o Distancia.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    // 3. Preparar la pantalla de resultados
+    txtResultadosGower.setText("--- ANÁLISIS DE GOWER ---\n");
+    txtResultadosGower.append("Dataset cargado. Total de instancias: " + dataset.getNumInstancias() + "\n");
+    
+    if (esSimilitud) {
+        txtResultadosGower.append("Calculando SIMILITUD (1.0 = Idénticos, 0.0 = Diferentes)\n");
+    } else {
+        txtResultadosGower.append("Calculando DISTANCIA (0.0 = Idénticos, 1.0 = Muy lejanos)\n");
+    }
+    
+    txtResultadosGower.append("Comparando la Fila 0 con el resto...\n");
+    txtResultadosGower.append("--------------------------------------------------\n\n");
+
+    try {
+        // 4. Instanciar nuestra clase lógica
+        Gower gower = new Gower(dataset);
+        int numInstancias = dataset.getNumInstancias();
+
+        // 5. Ciclo para comparar la fila 0 contra todas las demás (empezamos en 1)
+        for (int i = 1; i < numInstancias; i++) {
+            double resultado;
+            
+            if (esSimilitud) {
+                resultado = gower.calcularSimilitud(0, i);
+                // String.format nos ayuda a que solo salgan 4 decimales para que se vea limpio
+                txtResultadosGower.append(String.format("Fila 0 vs Fila %d -> %.4f\n", i, resultado));
+            } else {
+                resultado = gower.calcularDistancia(0, i);
+                txtResultadosGower.append(String.format("Fila 0 vs Fila %d -> %.4f\n", i, resultado));
+            }
+        }
+        
+        txtResultadosGower.append("\n¡Cálculo finalizado exitosamente!");
+        
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error al calcular Gower: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_btnIniciarGowerActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -610,9 +712,11 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private javax.swing.JRadioButton Reg_Log_radio;
     private javax.swing.JButton btnIniciar;
     private javax.swing.JButton btnIniciar2;
+    private javax.swing.JButton btnIniciarGower;
     private javax.swing.JButton buscarBtn;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JLabel infoLbl;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -622,13 +726,17 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField nombreDatasetLbl;
+    private javax.swing.JRadioButton radioGowerDistancia;
+    private javax.swing.JRadioButton radioGowerSimilitud;
     private javax.swing.JRadioButton radioRelief;
     private javax.swing.JLabel seleccionDatasetLbl;
     private javax.swing.JLabel tituloLbl;
     private javax.swing.JTextArea txtAreaResultados;
     private javax.swing.JTextArea txtAreaResultados1;
+    private javax.swing.JTextArea txtResultadosGower;
     // End of variables declaration//GEN-END:variables
 }
