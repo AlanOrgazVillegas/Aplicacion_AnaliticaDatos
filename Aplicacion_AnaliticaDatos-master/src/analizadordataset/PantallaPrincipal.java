@@ -65,6 +65,16 @@ public class PantallaPrincipal extends javax.swing.JFrame {
                         + dataset.getNumInstancias()
                         + " | Atributos: "
                         + dataset.getNumAtributos());
+                
+// --- AQUÍ EMPIEZA LO NUEVO PARA LA LISTA DE ATRIBUTOS ---
+            javax.swing.DefaultListModel<String> modeloLista = new javax.swing.DefaultListModel<>();
+            String[] nombresReales = dataset.getNombresColumnas(); // Usamos tu método
+            
+            for (int i = 0; i < dataset.getNumAtributos(); i++) {
+                modeloLista.addElement(i + " - " + nombresReales[i]); 
+            }
+            listaAtributos.setModel(modeloLista);
+            // --- AQUÍ TERMINA LO NUEVO ---
 
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this,
@@ -212,6 +222,9 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         btnIniciar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtAreaResultados = new javax.swing.JTextArea();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        listaAtributos = new javax.swing.JList<>();
+        btnEliminarAtributos = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         NaiveBayes_radio = new javax.swing.JRadioButton();
@@ -293,40 +306,69 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(txtAreaResultados);
 
+        listaAtributos.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        jScrollPane4.setViewportView(listaAtributos);
+
+        btnEliminarAtributos.setText("Eliminar");
+        btnEliminarAtributos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarAtributosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
-                .addComponent(radioRelief)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(CorrelationScore_radio)
-                .addGap(18, 18, 18)
-                .addComponent(GreedyStepwise_radio)
-                .addGap(21, 21, 21)
-                .addComponent(InformationGain)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(0, 6, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, Short.MAX_VALUE)
-                .addComponent(btnIniciar)
-                .addGap(26, 26, 26))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(radioRelief)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(CorrelationScore_radio)
+                        .addGap(18, 18, 18)
+                        .addComponent(GreedyStepwise_radio)
+                        .addGap(21, 21, 21)
+                        .addComponent(InformationGain)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnIniciar)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnEliminarAtributos)
+                                .addGap(0, 184, Short.MAX_VALUE)))
+                        .addGap(23, 23, 23))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(radioRelief)
-                    .addComponent(CorrelationScore_radio)
-                    .addComponent(GreedyStepwise_radio)
-                    .addComponent(InformationGain))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnIniciar)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(radioRelief)
+                            .addComponent(CorrelationScore_radio)
+                            .addComponent(GreedyStepwise_radio)
+                            .addComponent(InformationGain))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(btnIniciar)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnEliminarAtributos)))
                 .addContainerGap(25, Short.MAX_VALUE))
         );
 
@@ -440,7 +482,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 733, Short.MAX_VALUE)
+            .addGap(0, 917, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -473,7 +515,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 641, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
                         .addComponent(btnIniciarGower))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(radioGowerSimilitud)
@@ -506,7 +548,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 733, Short.MAX_VALUE)
+            .addGap(0, 917, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -669,6 +711,42 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     }
     }//GEN-LAST:event_btnIniciarGowerActionPerformed
 
+    private void btnEliminarAtributosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarAtributosActionPerformed
+if (dataset == null) {
+        JOptionPane.showMessageDialog(this, "Primero carga un dataset.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    // 1. Obtener qué seleccionó el usuario en la lista
+    int[] indicesSeleccionados = listaAtributos.getSelectedIndices();
+    if (indicesSeleccionados.length == 0) {
+        JOptionPane.showMessageDialog(this, "Selecciona al menos una columna de la lista para eliminar.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    try {
+        // 2. Llamar al nuevo método mágico que recorta el dataset
+        dataset.eliminarColumnas(indicesSeleccionados);
+
+        // 3. Actualizar la etiqueta que muestra cuántos atributos quedan
+        infoLbl.setText("Instancias: " + dataset.getNumInstancias() + " | Atributos: " + dataset.getNumAtributos());
+
+        // 4. Refrescar la lista visual para que desaparezcan las columnas borradas
+        javax.swing.DefaultListModel<String> modeloLista = new javax.swing.DefaultListModel<>();
+        String[] nombresActualizados = dataset.getNombresColumnas();
+        
+        for (int i = 0; i < dataset.getNumAtributos(); i++) {
+            modeloLista.addElement(i + " - " + nombresActualizados[i]);
+        }
+        listaAtributos.setModel(modeloLista);
+
+        JOptionPane.showMessageDialog(this, "Columnas eliminadas correctamente. El dataset ha sido actualizado.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error al eliminar: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_btnEliminarAtributosActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -710,6 +788,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private javax.swing.JRadioButton NaiveBayes_radio;
     private javax.swing.JTabbedPane PanelPestañas;
     private javax.swing.JRadioButton Reg_Log_radio;
+    private javax.swing.JButton btnEliminarAtributos;
     private javax.swing.JButton btnIniciar;
     private javax.swing.JButton btnIniciar2;
     private javax.swing.JButton btnIniciarGower;
@@ -727,8 +806,10 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JList<String> listaAtributos;
     private javax.swing.JTextField nombreDatasetLbl;
     private javax.swing.JRadioButton radioGowerDistancia;
     private javax.swing.JRadioButton radioGowerSimilitud;

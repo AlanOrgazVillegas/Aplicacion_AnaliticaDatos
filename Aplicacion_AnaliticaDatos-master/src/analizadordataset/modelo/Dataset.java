@@ -223,4 +223,52 @@ public class Dataset {
             System.out.println("  " + sb.toString());
         }
     }
+    
+    public void eliminarColumnas(int[] indicesAEliminar) {
+        // 1. Evitar que el usuario borre absolutamente todo
+        if (indicesAEliminar.length >= numAtributos) {
+            throw new IllegalArgumentException("No puedes eliminar todas las columnas del dataset.");
+        }
+
+        // 2. Crear una "máscara" de lo que vamos a conservar
+        boolean[] conservar = new boolean[numAtributos];
+        Arrays.fill(conservar, true);
+        for (int idx : indicesAEliminar) {
+            conservar[idx] = false;
+        }
+
+        // 3. Preparar los nuevos arreglos con el nuevo tamaño
+        int nuevoNumAtributos = numAtributos - indicesAEliminar.length;
+        String[] nuevosNombres = new String[nuevoNumAtributos];
+        char[] nuevosTipos = new char[nuevoNumAtributos];
+
+        int contador = 0;
+        for (int i = 0; i < numAtributos; i++) {
+            if (conservar[i]) {
+                nuevosNombres[contador] = nombresColumnas[i];
+                nuevosTipos[contador] = tiposColumnas[i];
+                contador++;
+            }
+        }
+
+        // 4. Recortar los datos fila por fila
+        List<String[]> nuevosDatos = new ArrayList<>();
+        for (String[] fila : datos) {
+            String[] nuevaFila = new String[nuevoNumAtributos];
+            contador = 0;
+            for (int i = 0; i < numAtributos; i++) {
+                if (conservar[i]) {
+                    nuevaFila[contador] = fila[i];
+                    contador++;
+                }
+            }
+            nuevosDatos.add(nuevaFila);
+        }
+
+        // 5. Reemplazar los datos viejos con los nuevos en la memoria
+        this.nombresColumnas = nuevosNombres;
+        this.tiposColumnas = nuevosTipos;
+        this.datos = nuevosDatos;
+        this.numAtributos = nuevoNumAtributos;
+    }
 }
