@@ -13,7 +13,8 @@ public class ControladorClasificacion {
             case "NAIVEBAYES":
                 clasificador = new NaiveBayes();
                 break;
-                
+              
+            case "Arbol":   
             case "J48":
                 clasificador = new J48();
                 break;
