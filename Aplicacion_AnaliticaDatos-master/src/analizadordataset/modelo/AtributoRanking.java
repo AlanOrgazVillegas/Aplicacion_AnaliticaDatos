@@ -27,7 +27,6 @@ public class AtributoRanking implements Comparable<AtributoRanking> {
     
     @Override
     public int compareTo(AtributoRanking otro) {
-        // Orden descendente por peso
         return Double.compare(otro.peso, this.peso);
     }
     

@@ -11,6 +11,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import analizadordataset.modelo.AtributoRanking;
 import java.util.List;
+import analizadordataset.controlador.ControladorClasificacionNS;
+import analizadordataset.modelo.ResultadoClustering;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.DefaultComboBoxModel;
 
 public class PantallaPrincipal extends javax.swing.JFrame {
 
@@ -19,6 +23,10 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private ControladorClasificacion controladorClasif;
     private Dataset datasetOriginal;
    private List<AtributoRanking> ultimoRanking;
+   private ControladorClasificacionNS controladorClustering;
+ 
+   private javax.swing.JLabel jLabelK;
+   private javax.swing.JLabel jLabelEnlace;
     
     public PantallaPrincipal() {
     initComponents();
@@ -46,6 +54,10 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     J48_radio.setActionCommand("J48");
     KNN_radio.setActionCommand("KNN");
     Reg_Log_radio.setActionCommand("REGRESION_LOGISTICA");
+    controladorClustering = new ControladorClasificacionNS();
+    spinnerK.setModel(new SpinnerNumberModel(3, 2, 20, 1));
+    comboEnlace.setModel(new DefaultComboBoxModel<>(new String[]{"average", "single", "complete"}));
+    
     
 }
     
@@ -280,7 +292,48 @@ if (resultado != null) {
     
     txtResultadosGower1.setText(reporte.toString());
 }
+    private void ejecutarClustering() {
+    if (dataset == null) {
+        JOptionPane.showMessageDialog(this, "Primero debes cargar un dataset.", "Error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    String algoritmoSeleccionado = "";
+    int k = (int) spinnerK.getValue();
+     String enlace = "average"; // Valor por defecto
+    if (comboEnlace != null) {
+        enlace = (String) comboEnlace.getSelectedItem();
+    }
     
+    if (KMenasManual_radio1.isSelected()) {
+        algoritmoSeleccionado = "KMEANSMANUAL";
+         controladorClustering.setK(k);
+    } else if (JerarquicoManual_radio1.isSelected()) {
+        algoritmoSeleccionado = "JERARQUICOMANUAL";
+         controladorClustering.setK(k);
+         controladorClustering.setEnlace(enlace);
+    } else if (DBSCANAuto_radio1.isSelected()) {
+        algoritmoSeleccionado = "DBSCANAUTO";
+    } else if (AutoKMeans_radio1.isSelected()) {
+        algoritmoSeleccionado = "AUTOKMEANS";
+    } else {
+        JOptionPane.showMessageDialog(this, "Selecciona un algoritmo.", "Información", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    try {
+        ResultadoClustering resultado = controladorClustering.ejecutarClustering(algoritmoSeleccionado, dataset);
+        
+        if (resultado != null) {
+            txtAreaResultados2.setText(resultado.generarReporte());
+        } else {
+            txtAreaResultados2.setText("Error al ejecutar el algoritmo.");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        txtAreaResultados2.setText("ERROR: " + e.getMessage());
+    }
+}
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -315,7 +368,6 @@ if (resultado != null) {
         btnIniciar2 = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtAreaResultados1 = new javax.swing.JTextArea();
-        jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         radioGowerSimilitud = new javax.swing.JRadioButton();
         radioGowerDistancia = new javax.swing.JRadioButton();
@@ -327,6 +379,18 @@ if (resultado != null) {
         txtResultadosGower1 = new javax.swing.JTextArea();
         btnIniciar1 = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel3 = new javax.swing.JPanel();
+        KMenasManual_radio1 = new javax.swing.JRadioButton();
+        JerarquicoManual_radio1 = new javax.swing.JRadioButton();
+        DBSCANAuto_radio1 = new javax.swing.JRadioButton();
+        AutoKMeans_radio1 = new javax.swing.JRadioButton();
+        btnIniciar3 = new javax.swing.JButton();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        txtAreaResultados2 = new javax.swing.JTextArea();
+        jLabel1 = new javax.swing.JLabel();
+        spinnerK = new javax.swing.JSpinner();
+        jLabel2 = new javax.swing.JLabel();
+        comboEnlace = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -562,19 +626,6 @@ if (resultado != null) {
 
         PanelPestañas.addTab("Clasificación supervisada", jPanel2);
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 918, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 297, Short.MAX_VALUE)
-        );
-
-        PanelPestañas.addTab("Clasificación no supervisada", jPanel3);
-
         radioGowerSimilitud.setText("Similitud");
 
         radioGowerDistancia.setText("Distancia");
@@ -664,6 +715,123 @@ if (resultado != null) {
 
         PanelPestañas.addTab("Resultados", jPanel5);
         PanelPestañas.addTab("", jTabbedPane1);
+
+        KMenasManual_radio1.setText("KMeansManual");
+        KMenasManual_radio1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                KMenasManual_radio1ActionPerformed(evt);
+            }
+        });
+
+        JerarquicoManual_radio1.setText("JerarquicoManual");
+        JerarquicoManual_radio1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                JerarquicoManual_radio1ActionPerformed(evt);
+            }
+        });
+
+        DBSCANAuto_radio1.setText("DBSCANAuto");
+        DBSCANAuto_radio1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DBSCANAuto_radio1ActionPerformed(evt);
+            }
+        });
+
+        AutoKMeans_radio1.setText("AutoKMeans");
+        AutoKMeans_radio1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AutoKMeans_radio1ActionPerformed(evt);
+            }
+        });
+
+        btnIniciar3.setText("Iniciar");
+        btnIniciar3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnIniciar3ActionPerformed(evt);
+            }
+        });
+
+        txtAreaResultados2.setColumns(20);
+        txtAreaResultados2.setRows(5);
+        txtAreaResultados2.addAncestorListener(new javax.swing.event.AncestorListener() {
+            public void ancestorAdded(javax.swing.event.AncestorEvent evt) {
+                txtAreaResultados2AncestorAdded(evt);
+            }
+            public void ancestorMoved(javax.swing.event.AncestorEvent evt) {
+            }
+            public void ancestorRemoved(javax.swing.event.AncestorEvent evt) {
+            }
+        });
+        jScrollPane6.setViewportView(txtAreaResultados2);
+
+        jLabel1.setText("Número de clusters (k):");
+
+        jLabel2.setText("Tipo de enlace (Jerárquico):");
+
+        comboEnlace.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "average", "single", "complete" }));
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(KMenasManual_radio1)
+                        .addGap(18, 18, 18)
+                        .addComponent(JerarquicoManual_radio1)
+                        .addGap(18, 18, 18)
+                        .addComponent(DBSCANAuto_radio1)
+                        .addGap(18, 18, 18)
+                        .addComponent(AutoKMeans_radio1)
+                        .addGap(90, 90, 90))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(0, 118, Short.MAX_VALUE)
+                        .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 611, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel2))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addComponent(spinnerK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(52, 52, 52)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(btnIniciar3)
+                            .addComponent(comboEnlace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(25, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(KMenasManual_radio1)
+                    .addComponent(JerarquicoManual_radio1)
+                    .addComponent(DBSCANAuto_radio1)
+                    .addComponent(AutoKMeans_radio1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(spinnerK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(comboEnlace, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnIniciar3))
+                    .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(25, Short.MAX_VALUE))
+        );
+
+        PanelPestañas.addTab("Clasificación no supervisada", jPanel3);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -869,6 +1037,30 @@ if (resultado != null) {
     private void radioReliefActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioReliefActionPerformed
 
     }//GEN-LAST:event_radioReliefActionPerformed
+
+    private void KMenasManual_radio1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KMenasManual_radio1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_KMenasManual_radio1ActionPerformed
+
+    private void JerarquicoManual_radio1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JerarquicoManual_radio1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_JerarquicoManual_radio1ActionPerformed
+
+    private void DBSCANAuto_radio1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DBSCANAuto_radio1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_DBSCANAuto_radio1ActionPerformed
+
+    private void AutoKMeans_radio1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AutoKMeans_radio1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_AutoKMeans_radio1ActionPerformed
+
+    private void btnIniciar3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciar3ActionPerformed
+         ejecutarClustering();
+    }//GEN-LAST:event_btnIniciar3ActionPerformed
+
+    private void txtAreaResultados2AncestorAdded(javax.swing.event.AncestorEvent evt) {//GEN-FIRST:event_txtAreaResultados2AncestorAdded
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtAreaResultados2AncestorAdded
         
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -903,10 +1095,14 @@ if (resultado != null) {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton AutoKMeans_radio1;
     private javax.swing.JRadioButton CorrelationScore_radio;
+    private javax.swing.JRadioButton DBSCANAuto_radio1;
     private javax.swing.JRadioButton GreedyStepwise_radio;
     private javax.swing.JRadioButton InformationGain;
     private javax.swing.JRadioButton J48_radio;
+    private javax.swing.JRadioButton JerarquicoManual_radio1;
+    private javax.swing.JRadioButton KMenasManual_radio1;
     private javax.swing.JRadioButton KNN_radio;
     private javax.swing.JRadioButton NaiveBayes_radio;
     private javax.swing.JTabbedPane PanelPestañas;
@@ -915,12 +1111,16 @@ if (resultado != null) {
     private javax.swing.JButton btnIniciar;
     private javax.swing.JButton btnIniciar1;
     private javax.swing.JButton btnIniciar2;
+    private javax.swing.JButton btnIniciar3;
     private javax.swing.JButton btnIniciarGower;
     private javax.swing.JButton buscarBtn;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup3;
+    private javax.swing.JComboBox<String> comboEnlace;
     private javax.swing.JLabel infoLbl;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -932,6 +1132,7 @@ if (resultado != null) {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JList<String> listaAtributos;
@@ -940,9 +1141,11 @@ if (resultado != null) {
     private javax.swing.JRadioButton radioGowerSimilitud;
     private javax.swing.JRadioButton radioRelief;
     private javax.swing.JLabel seleccionDatasetLbl;
+    private javax.swing.JSpinner spinnerK;
     private javax.swing.JLabel tituloLbl;
     private javax.swing.JTextArea txtAreaResultados;
     private javax.swing.JTextArea txtAreaResultados1;
+    private javax.swing.JTextArea txtAreaResultados2;
     private javax.swing.JTextArea txtResultadosGower;
     private javax.swing.JTextArea txtResultadosGower1;
     // End of variables declaration//GEN-END:variables

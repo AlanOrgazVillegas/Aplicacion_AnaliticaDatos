@@ -291,4 +291,107 @@ public class Dataset {
     
     return copia;
 }
+    // Obtener un dataset sin la última columna (asumida como clase)
+public Dataset getDatasetSinClase() throws Exception {
+    if (getNumAtributos() <= 1) return clonar();
+    Dataset nuevo = new Dataset();
+    nuevo.nombresColumnas = new String[getNumAtributos() - 1];
+    System.arraycopy(this.nombresColumnas, 0, nuevo.nombresColumnas, 0, getNumAtributos() - 1);
+    
+    nuevo.tiposColumnas = new char[getNumAtributos() - 1];
+    System.arraycopy(this.tiposColumnas, 0, nuevo.tiposColumnas, 0, getNumAtributos() - 1);
+    
+    nuevo.datos = new ArrayList<>();
+    for (String[] fila : this.datos) {
+        String[] nuevaFila = new String[getNumAtributos() - 1];
+        System.arraycopy(fila, 0, nuevaFila, 0, getNumAtributos() - 1);
+        nuevo.datos.add(nuevaFila);
+    }
+    nuevo.numInstancias = this.numInstancias;
+    nuevo.numAtributos = this.numAtributos - 1;
+    return nuevo;
+}
+
+// Convertir columnas seleccionadas a matriz double (estandariza si true)
+public double[][] getMatrizNumerica(int[] columnasIndices, boolean estandarizar) {
+    if (columnasIndices == null) {
+        columnasIndices = new int[getNumAtributos()];
+        for (int i = 0; i < getNumAtributos(); i++) columnasIndices[i] = i;
+    }
+    int n = getNumInstancias();
+    int m = columnasIndices.length;
+    double[][] matriz = new double[n][m];
+    
+    // Codificación de variables categóricas
+    java.util.Map<Integer, java.util.Map<String, Integer>> codificadores = new java.util.HashMap<>();
+    for (int j = 0; j < m; j++) {
+        int col = columnasIndices[j];
+        if (tiposColumnas[col] == 'C') {
+            codificadores.put(j, new java.util.HashMap<>());
+        }
+    }
+    
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            int col = columnasIndices[j];
+            String valor = datos.get(i)[col].trim();
+            if (tiposColumnas[col] == 'N') {
+                matriz[i][j] = Double.parseDouble(valor);
+            } else {
+                java.util.Map<String, Integer> mapa = codificadores.get(j);
+                if (!mapa.containsKey(valor)) {
+                    mapa.put(valor, mapa.size());
+                }
+                matriz[i][j] = mapa.get(valor);
+            }
+        }
+    }
+    
+    if (estandarizar) {
+        for (int j = 0; j < m; j++) {
+            double media = 0;
+            for (int i = 0; i < n; i++) media += matriz[i][j];
+            media /= n;
+            double var = 0;
+            for (int i = 0; i < n; i++) var += Math.pow(matriz[i][j] - media, 2);
+            double desv = Math.sqrt(var / n);
+            if (desv < 1e-9) desv = 1;
+            for (int i = 0; i < n; i++) {
+                matriz[i][j] = (matriz[i][j] - media) / desv;
+            }
+        }
+    }
+    return matriz;
+}
+public Dataset crearSubset(List<Integer> indicesColumnas) {
+    Dataset subset = new Dataset();
+    
+    // Nuevos nombres de columnas
+    String[] nuevosNombres = new String[indicesColumnas.size()];
+    char[] nuevosTipos = new char[indicesColumnas.size()];
+    
+    for (int i = 0; i < indicesColumnas.size(); i++) {
+        int idx = indicesColumnas.get(i);
+        nuevosNombres[i] = this.nombresColumnas[idx];
+        nuevosTipos[i] = this.tiposColumnas[idx];
+    }
+    
+    subset.nombresColumnas = nuevosNombres;
+    subset.tiposColumnas = nuevosTipos;
+    subset.numAtributos = nuevosNombres.length;
+    subset.numInstancias = this.numInstancias;
+    subset.datos = new ArrayList<>();
+    
+    // Copiar solo las columnas seleccionadas
+    for (String[] fila : this.datos) {
+        String[] nuevaFila = new String[indicesColumnas.size()];
+        for (int i = 0; i < indicesColumnas.size(); i++) {
+            int idx = indicesColumnas.get(i);
+            nuevaFila[i] = fila[idx];
+        }
+        subset.datos.add(nuevaFila);
+    }
+    
+    return subset;
+}
 }
